@@ -4,13 +4,15 @@
 # Identifies core files that fail checksum test
 
 for i in $(wp core verify-checksums 2>&1 | awk -F": " '/m\:/{print $3}'); do
-
+path=$(echo $i | rev | cut -d'/' -f2- | rev)
+file=$(echo $i | awk -F'/' '{print $NF}')
 # Backs up the core file that is to be replaced
 
-mv $i{,.$(date +%s).bak}
+mv -v $i{,.$(date +%s).bak}
 
 # Downloads a copy of identified core file for WP version of current working directory
 
 wget https://core.svn.wordpress.org/tags/$(awk -F"'" '/wp_version\ \=/{print $2}' wp-includes/version.php)/$i
+mv $file $path
 
 done
